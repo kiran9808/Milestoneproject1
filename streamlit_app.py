@@ -56,19 +56,10 @@ def _ensure_database(db_path: Path) -> Path:
 
 
 def _db_path() -> Path:
-    from src.phases.phase1.config import DEFAULT_CLOUD_SQLITE_PATH, DEFAULT_SQLITE_PATH
+    from src.phases.phase1.config import resolve_sqlite_path
 
-    raw = os.environ.get("RESTAURANTS_DB_PATH")
-    if raw:
-        return _ensure_database(Path(raw))
-
-    # Local dev: full ingest DB when present; Streamlit Cloud: bundled sample DB
-    if DEFAULT_SQLITE_PATH.is_file():
-        return DEFAULT_SQLITE_PATH
-    if DEFAULT_CLOUD_SQLITE_PATH.is_file():
-        return DEFAULT_CLOUD_SQLITE_PATH
-
-    return _ensure_database(DEFAULT_CLOUD_SQLITE_PATH)
+    path = resolve_sqlite_path()
+    return _ensure_database(path)
 
 
 @st.cache_resource

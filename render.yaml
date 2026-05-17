@@ -1,0 +1,18 @@
+# Deploy REST API for the Vercel frontend (Streamlit URL is UI-only, not this service).
+# Dashboard: https://dashboard.render.com → New → Blueprint → connect this repo.
+services:
+  - type: web
+    name: milestoneproject1-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements-api.txt
+    startCommand: uvicorn src.phases.phase2.api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: RESTAURANTS_DB_PATH
+        value: data/restaurants_cloud.db
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: http://localhost:3000,https://*.vercel.app

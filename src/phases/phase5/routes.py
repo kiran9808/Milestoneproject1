@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import logging
-import os
 from pathlib import Path
 
 from fastapi import APIRouter, Header, HTTPException
 
-from src.phases.phase1.config import DEFAULT_SQLITE_PATH
+from src.phases.phase1.config import ENV_DB_PATH, resolve_sqlite_path
 
 from src.phases.phase2.dto import RecommendationRequest
 
@@ -17,14 +16,11 @@ from .service import run_ranked_recommendation
 
 logger = logging.getLogger(__name__)
 
-ENV_DB_PATH = "RESTAURANTS_DB_PATH"
-
 router = APIRouter(tags=["Phase 5 — Ranked recommendations"])
 
 
 def _db_path() -> Path:
-    raw = os.environ.get(ENV_DB_PATH)
-    return Path(raw) if raw else DEFAULT_SQLITE_PATH
+    return resolve_sqlite_path()
 
 
 @router.post(

@@ -7,12 +7,13 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from src.phases.phase1 import Phase1DataService
 from src.phases.phase5.routes import router as phase5_router
-from src.phases.phase1.config import DEFAULT_SQLITE_PATH
+from src.phases.phase1.config import resolve_sqlite_path
 
 from .dto import (
     CuisinesResponse,
@@ -30,8 +31,12 @@ _WEB_ROOT = Path(__file__).resolve().parents[3] / "web"
 
 
 def _db_path() -> Path:
-    raw = os.environ.get(ENV_DB_PATH)
-    return Path(raw) if raw else DEFAULT_SQLITE_PATH
+    return resolve_sqlite_path()
+
+
+def _cors_origins() -> list[str]:
+    raw = os.environ.get("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
+    return [o.strip() for o in raw.split(",") if o.strip()]
 
 
 def create_app() -> FastAPI:
@@ -42,6 +47,15 @@ def create_app() -> FastAPI:
         "Phase 2 — validated preferences and candidate lookup (Phase 1 store). "
         "Phase 5 — POST /recommendations/ranked for LLM-ranked JSON with stable contract."
     ),
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=_cors_origins(),
+        allow_origin_regex=r"https://.*\.vercel\.app",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     app.include_router(phase5_router)

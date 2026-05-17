@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Zomato AI Scout (Next.js frontend)
 
-## Getting Started
+Phase 5 UI for the restaurant recommendation system. Talks to the **FastAPI** REST API (not the Streamlit app URL).
 
-First, run the development server:
+## Local development
+
+From this directory:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This starts FastAPI on `http://127.0.0.1:8000` and Next.js on `http://localhost:3000`. API calls use `/api/py/*` proxies.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Copy env template:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cp .env.example .env.local
+```
 
-## Learn More
+## Deploy frontend on Vercel
 
-To learn more about Next.js, take a look at the following resources:
+1. Import the GitHub repo **Milestoneproject1** on [Vercel](https://vercel.com/new).
+2. Set **Root Directory** to `zomato-ai-scout`.
+3. Deploy the **REST API** first (see below) and copy its URL.
+4. In Vercel → **Settings → Environment Variables**:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Variable | Value |
+|----------|--------|
+| `BACKEND_URL` | `https://YOUR-API.onrender.com` (no trailing slash) |
+| `NEXT_PUBLIC_STREAMLIT_APP_URL` | `https://milestoneproject1-amob2aaxond6fjnqzp2oih.streamlit.app` |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Redeploy the frontend.
 
-## Deploy on Vercel
+> **Important:** `BACKEND_URL` must be the **FastAPI** service (`/health`, `/locations`, `/recommendations/ranked`). The Streamlit URL is a separate Python UI and cannot serve those JSON endpoints.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Deploy REST API on Render (free)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+From the repository root on GitHub:
+
+1. [Render Dashboard](https://dashboard.render.com) → **New** → **Blueprint** → connect **Milestoneproject1**.
+2. Apply `render.yaml` (service `milestoneproject1-api`).
+3. Set **GROQ_API_KEY** in the Render service environment.
+4. After deploy, use the Render URL as `BACKEND_URL` in Vercel (e.g. `https://milestoneproject1-api.onrender.com`).
+
+Health check: `GET https://YOUR-API.onrender.com/health` → `{"status":"ok"}`.
+
+## Architecture
+
+| Layer | Platform | URL role |
+|-------|----------|----------|
+| Frontend | Vercel | Next.js UI |
+| REST API | Render (or local) | JSON for the frontend |
+| Python UI | Streamlit Cloud | Standalone demo / admin |

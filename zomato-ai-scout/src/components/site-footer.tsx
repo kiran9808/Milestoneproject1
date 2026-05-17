@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Bot, Globe } from "lucide-react";
+import { STREAMLIT_APP_URL } from "@/lib/backend";
 
 export function SiteFooter() {
   return (
@@ -14,7 +15,7 @@ export function SiteFooter() {
             artificial intelligence and community insights.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-12">
+        <div className="grid grid-cols-2 gap-12 sm:grid-cols-3">
           <div>
             <h4 className="mb-4 text-xs font-bold uppercase tracking-wider text-on-surface">
               Company
@@ -23,6 +24,18 @@ export function SiteFooter() {
               <FooterLink href="#">About Us</FooterLink>
               <FooterLink href="#">Partner with Us</FooterLink>
               <FooterLink href="#">Careers</FooterLink>
+            </div>
+          </div>
+          <div>
+            <h4 className="mb-4 text-xs font-bold uppercase tracking-wider text-on-surface">
+              Product
+            </h4>
+            <div className="flex flex-col gap-2">
+              {STREAMLIT_APP_URL ? (
+                <FooterLink href={STREAMLIT_APP_URL} external>
+                  Streamlit backend UI
+                </FooterLink>
+              ) : null}
             </div>
           </div>
           <div>
@@ -53,10 +66,25 @@ export function SiteFooter() {
 function FooterLink({
   href,
   children,
+  external = false,
 }: {
   href: string;
   children: React.ReactNode;
+  external?: boolean;
 }) {
+  if (external) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sm text-on-surface-variant transition-colors hover:text-primary"
+      >
+        {children}
+      </a>
+    );
+  }
+
   return (
     <Link
       href={href}

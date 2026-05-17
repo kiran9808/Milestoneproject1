@@ -23,6 +23,12 @@ function cuisinePayload(value: string): string | null {
 
 async function parseErrorMessage(res: Response): Promise<string> {
   const ct = res.headers.get("content-type") ?? "";
+  if (ct.includes("text/html")) {
+    return (
+      "API returned HTML instead of JSON. Set Vercel BACKEND_URL to your FastAPI host " +
+      "(Render), not the Streamlit app URL."
+    );
+  }
   if (ct.includes("application/json")) {
     const body = (await res.json()) as { detail?: unknown };
     if (typeof body.detail === "string") return body.detail;
