@@ -24,14 +24,16 @@ cp .env.example .env.local
 1. Import the GitHub repo **Milestoneproject1** on [Vercel](https://vercel.com/new).
 2. Set **Root Directory** to `zomato-ai-scout`.
 3. Deploy the **REST API** first (see below) and copy its URL.
-4. In Vercel → **Settings → Environment Variables**:
+4. In Vercel → **Settings → Environment Variables** (then **Redeploy**):
 
 | Variable | Value |
 |----------|--------|
-| `BACKEND_URL` | `https://YOUR-API.onrender.com` (no trailing slash) |
-| `NEXT_PUBLIC_STREAMLIT_APP_URL` | `https://milestoneproject1-amob2aaxond6fjnqzp2oih.streamlit.app` |
+| `BACKEND_URL` | `https://YOUR-API.onrender.com` (no trailing slash) — required for **Get Recommendation** |
+| `NEXT_PUBLIC_STREAMLIT_APP_URL` | `https://milestoneproject1-amob2aaxond6fjnqzp2oih.streamlit.app` (optional) |
 
-5. Redeploy the frontend.
+5. Redeploy the frontend after saving env vars.
+
+**Locations / cuisines** load from bundled `public/api-metadata.json` if `BACKEND_URL` is missing. **Ranked recommendations** still need a live FastAPI `BACKEND_URL`.
 
 > **Important:** `BACKEND_URL` must be the **FastAPI** service (`/health`, `/locations`, `/recommendations/ranked`). The Streamlit URL is a separate Python UI and cannot serve those JSON endpoints.
 

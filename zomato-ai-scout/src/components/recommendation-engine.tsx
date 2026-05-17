@@ -10,6 +10,7 @@ import {
   StarHalf,
   UtensilsCrossed,
 } from "lucide-react";
+import { loadApiMetadata } from "@/lib/api-metadata";
 import { backendPath } from "@/lib/backend";
 import type { RankedRecommendationsPayload } from "@/lib/ranked-types";
 
@@ -56,13 +57,28 @@ export function RecommendationEngine() {
       setLocationsError(null);
       try {
         const res = await fetch(backendPath("/locations"));
-        if (!res.ok) {
-          throw new Error(await parseErrorMessage(res));
+        if (res.ok) {
+          const data = (await res.json()) as { locations?: string[] };
+          const list = Array.isArray(data.locations) ? data.locations : [];
+          if (!cancelled) setLocations(list);
+          return;
         }
-        const data = (await res.json()) as { locations?: string[] };
-        const list = Array.isArray(data.locations) ? data.locations : [];
-        if (!cancelled) setLocations(list);
+        if (res.status === 404 || res.status === 503 || res.status === 502) {
+          const meta = await loadApiMetadata();
+          if (!cancelled) setLocations(meta.locations);
+          return;
+        }
+        throw new Error(await parseErrorMessage(res));
       } catch (e) {
+        try {
+          const meta = await loadApiMetadata();
+          if (!cancelled) {
+            setLocations(meta.locations);
+            return;
+          }
+        } catch {
+          /* use primary error below */
+        }
         if (!cancelled)
           setLocationsError(
             e instanceof Error ? e.message : "Could not load locations.",
@@ -103,15 +119,31 @@ export function RecommendationEngine() {
         const res = await fetch(
           `${backendPath("/cuisines")}?${q.toString()}`,
         );
-        if (!res.ok) {
-          throw new Error(await parseErrorMessage(res));
+        if (res.ok) {
+          const data = (await res.json()) as { cuisines?: string[] };
+          const raw = Array.isArray(data.cuisines) ? data.cuisines : [];
+          const unique = [...new Set(raw.map((c) => c.trim()).filter(Boolean))];
+          unique.sort((a, b) => a.localeCompare(b));
+          if (!cancelled) setCuisineOptions(unique);
+          return;
         }
-        const data = (await res.json()) as { cuisines?: string[] };
-        const raw = Array.isArray(data.cuisines) ? data.cuisines : [];
-        const unique = [...new Set(raw.map((c) => c.trim()).filter(Boolean))];
-        unique.sort((a, b) => a.localeCompare(b));
-        if (!cancelled) setCuisineOptions(unique);
+        if (res.status === 404 || res.status === 503 || res.status === 502) {
+          const meta = await loadApiMetadata();
+          const raw = meta.cuisines_by_location[loc] ?? [];
+          if (!cancelled) setCuisineOptions(raw);
+          return;
+        }
+        throw new Error(await parseErrorMessage(res));
       } catch (e) {
+        try {
+          const meta = await loadApiMetadata();
+          if (!cancelled) {
+            setCuisineOptions(meta.cuisines_by_location[loc] ?? []);
+            return;
+          }
+        } catch {
+          /* use primary error below */
+        }
         if (!cancelled)
           setCuisinesError(
             e instanceof Error ? e.message : "Could not load cuisines.",
@@ -177,7 +209,7 @@ export function RecommendationEngine() {
       setError(
         e instanceof Error
           ? e.message
-          : "Could not reach the API. Is the backend running on port 8000?",
+          : "Could not reach the API. Set BACKEND_URL on Vercel to your FastAPI (Render) URL.",
       );
     } finally {
       setLoading(false);
