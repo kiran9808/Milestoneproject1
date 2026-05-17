@@ -8,6 +8,7 @@ __pycache__/
 dist/
 build/
 data/*.db
+!data/restaurants_cloud.db
 data/*.db-journal
 .pytest_cache/
 .DS_Store

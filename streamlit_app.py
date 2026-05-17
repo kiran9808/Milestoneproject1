@@ -56,11 +56,19 @@ def _ensure_database(db_path: Path) -> Path:
 
 
 def _db_path() -> Path:
-    from src.phases.phase1.config import DEFAULT_SQLITE_PATH
+    from src.phases.phase1.config import DEFAULT_CLOUD_SQLITE_PATH, DEFAULT_SQLITE_PATH
 
     raw = os.environ.get("RESTAURANTS_DB_PATH")
-    path = Path(raw) if raw else DEFAULT_SQLITE_PATH
-    return _ensure_database(path)
+    if raw:
+        return _ensure_database(Path(raw))
+
+    # Local dev: full ingest DB when present; Streamlit Cloud: bundled sample DB
+    if DEFAULT_SQLITE_PATH.is_file():
+        return DEFAULT_SQLITE_PATH
+    if DEFAULT_CLOUD_SQLITE_PATH.is_file():
+        return DEFAULT_CLOUD_SQLITE_PATH
+
+    return _ensure_database(DEFAULT_CLOUD_SQLITE_PATH)
 
 
 @st.cache_resource
@@ -92,11 +100,14 @@ def main() -> None:
 
     if not db.is_file():
         st.error(
-            "Restaurant database not found. Either run Phase 1 ingest locally and upload "
-            "`data/restaurants.db`, set `RESTAURANTS_DB_PATH` in secrets, or set "
-            "`RESTAURANTS_DB_URL` to a downloadable SQLite file."
+            "Restaurant database not found. The app expects `data/restaurants_cloud.db` "
+            "(bundled sample) or a full `data/restaurants.db` after Phase 1 ingest. "
+            "You can also set `RESTAURANTS_DB_PATH` or `RESTAURANTS_DB_URL` in Streamlit secrets."
         )
         st.stop()
+
+    if db.name == "restaurants_cloud.db":
+        st.info("Using bundled sample database (12k restaurants). For the full dataset, run Phase 1 ingest locally.")
 
     if not groq_ok:
         st.warning("Add `GROQ_API_KEY` in Streamlit **Settings → Secrets** (or project `.env` locally).")
