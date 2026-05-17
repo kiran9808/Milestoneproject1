@@ -52,6 +52,9 @@ def _cmd_serve(args: argparse.Namespace) -> int:
         host=args.host,
         port=args.port,
         reload=args.reload,
+        # Avoid uvloop/httptools extras — matches Streamlit Cloud requirements.txt
+        loop="asyncio",
+        http="h11",
     )
     return 0
 

@@ -4,17 +4,24 @@ version = "0.1.0"
 description = "AI-powered restaurant recommendation system (phase-wise)"
 requires-python = ">=3.10"
 dependencies = [
-    "datasets>=2.16.0",
     "fastapi>=0.109.0",
-    "huggingface_hub>=0.20.0",
     "openai>=1.30.0",
     "pydantic>=2.0.0",
     "python-dotenv>=1.0.0",
-    "uvicorn[standard]>=0.27.0",
+    "uvicorn>=0.27.0",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0.0"]
+ingest = [
+    "datasets>=2.16.0",
+    "huggingface_hub>=0.20.0",
+]
+streamlit = [
+    "streamlit>=1.32.0",
+]
+dev = [
+    "pytest>=7.0.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["."]

@@ -4,9 +4,10 @@ Implements the architecture doc: Hugging Face load, normalization, canonical `Re
 
 ## Ingest
 
-From the repository root (with dependencies installed and network available):
+From the repository root (with ingest dependencies and network available):
 
 ```bash
+pip install -e ".[ingest]"
 python -m src.phases.phase1.cli ingest
 ```
 
