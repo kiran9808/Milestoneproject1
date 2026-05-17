@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Restaurant recommendations — demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Restaurant recommendations</h1>
+      <p class="sub">
+        Demo UI for <code>POST /recommendations/ranked</code>. Open <code>/ui/</code> while the API runs on port 8000.
+      </p>
+
+      <form id="prefs-form" class="panel">
+        <div class="row">
+          <div>
+            <label for="location">Location</label>
+            <select id="location" name="location" required>
+              <option value="">Loading locations…</option>
+            </select>
+            <p class="field-hint">Areas from your database.</p>
+          </div>
+          <div>
+            <label for="budget_amount">Budget (max cost for two, ₹)</label>
+            <input
+              id="budget_amount"
+              name="budget_amount"
+              type="number"
+              min="0"
+              step="50"
+              value="800"
+              required
+            />
+            <p class="field-hint">0 = no upper limit. Otherwise only venues at or below this cost.</p>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label for="cuisine">Cuisine (optional)</label>
+            <select id="cuisine" name="cuisine">
+              <option value="">Loading cuisines…</option>
+            </select>
+            <p class="field-hint">Unique cuisine tags from the dataset.</p>
+          </div>
+          <div class="rating-scale">
+            <label for="min_rating">Min rating</label>
+            <div class="rating-scale-row">
+              <span class="scale-end">0</span>
+              <input type="range" id="min_rating" name="min_rating" min="0" max="5" step="0.1" value="0" />
+              <span class="scale-end">5</span>
+            </div>
+            <div class="rating-value-row">
+              <output id="min_rating_value" for="min_rating">0.0</output>
+              <span class="field-hint">/ 5 (minimum)</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 0.75rem">
+          <label for="additional_preferences">Additional preferences (optional)</label>
+          <textarea id="additional_preferences" name="additional_preferences" rows="3" placeholder="Quiet place, outdoor seating…"></textarea>
+        </div>
+        <div style="margin-top: 1rem">
+          <button type="submit">Get recommendations</button>
+        </div>
+      </form>
+
+      <p id="status" class="sub"></p>
+      <p id="error" class="err hidden"></p>
+
+      <div id="output" class="hidden">
+        <div class="panel">
+          <span id="fallback-badge" class="badge fallback hidden">Used deterministic fallback (no LLM or LLM error)</span>
+          <div id="disclaimer" class="disclaimer"></div>
+          <p id="summary" class="summary hidden"></p>
+          <div id="cards" class="cards"></div>
+          <p id="selection" class="meta-foot hidden"></p>
+        </div>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

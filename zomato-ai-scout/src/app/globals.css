@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fbf9f8;
+  --foreground: #1b1c1c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: #b7122a;
+  --color-on-primary: #ffffff;
+  --color-surface: #fbf9f8;
+  --color-on-surface: #1b1c1c;
+  --color-on-surface-variant: #5b403f;
+  --color-surface-container: #efeded;
+  --color-surface-container-high: #e9e8e7;
+  --color-surface-container-highest: #e4e2e2;
+  --color-outline-variant: #e4bebc;
+  --color-primary-container: #db313f;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #fbf9f8;
+    --foreground: #1b1c1c;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@layer utilities {
+  .font-heading {
+    font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .hero-gradient {
+    background: linear-gradient(
+      rgba(0, 0, 0, 0.45),
+      rgba(0, 0, 0, 0.45)
+    );
+  }
+
+  .ai-glow {
+    box-shadow: 0 0 20px rgba(187, 22, 44, 0.15);
+  }
+}

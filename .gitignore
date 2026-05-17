@@ -1,0 +1,17 @@
+.env
+src/phases/phase4/.env
+**/apikey.env
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+data/*.db
+data/*.db-journal
+.pytest_cache/
+.DS_Store
+node_modules/
+.next/
+out/
+.vercel/
